@@ -2,7 +2,7 @@ import React from 'react';
 import { SafeAreaView, View, Image, Text, TextInput, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
-import estilo from './styles.js';
+import estilo from './styles';
 import trans from '../../assets/trans.png';
 
 const Login = (props) => {

@@ -3,7 +3,7 @@ import { SafeAreaView, View, Image, Text, TextInput, TouchableOpacity, Pressable
 import CheckBox from 'expo-checkbox';
 import { FontAwesome } from '@expo/vector-icons';
 
-import estilo from './styles.js';
+import estilo from './styles';
 import trans from '../../assets/trans.png';
 
 const Cadastro = (props) => {

@@ -12,8 +12,8 @@ const estilo = StyleSheet.create({
     logo: {
         flexDirection: 'column',
         alignSelf: 'center',
-        width: 140,
-        height: 140,
+        width: 180,
+        height: 180,
         marginVertical: 50
     },
     inputLinha: {
@@ -31,7 +31,7 @@ const estilo = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'stretch',
-        marginVertical: 40,
+        marginVertical: 20,
     },
     btn: {
         backgroundColor: "#27A3DC",
@@ -44,21 +44,6 @@ const estilo = StyleSheet.create({
         fontStyle: 'italic',
         paddingHorizontal: 20,
         paddingVertical: 10,
-    },
-    voltar: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-    },
-    btnVoltar: {
-        backgroundColor: '#F1E3EA',
-        borderRadius: 20,
-    },
-    textBtnVoltar: {
-        fontSize: 15,
-        color: '#968E8E',
-        paddingHorizontal: 15,
-        lineHeight: 30,
-        alignSelf: 'center'
     },
     inputNormal: {
         fontSize: 17,
@@ -74,6 +59,7 @@ const estilo = StyleSheet.create({
     },
     inputNormalSenha: {
         backgroundColor: '#F1E3EA',
+        alignSelf: 'center',
         width: 200,
         fontSize: 17,
         fontWeight: '400',
@@ -94,7 +80,8 @@ const estilo = StyleSheet.create({
     inputLegend: {
         fontSize: 10,
         color: '#968E8E',
-        paddingHorizontal: 20,
+        paddingVertical: 5,
+        alignSelf: 'center'
     },
     checkbox: {
         borderWidth: 0,
@@ -109,15 +96,16 @@ const estilo = StyleSheet.create({
         color: '#968E8E',
         paddingHorizontal: 5,
     },
-    listItem:{
-        backgroundColor:'#ddd',
-        flexDirection:'row',
+    btnCadastro: {
+        backgroundColor: '#F1E3EA',
+        borderRadius: 20,
     },
-    item:{
-        marginVertical: 5,
-        flex: 0.5,
-        textAlign: 'center',
-        alignItems:'flex-start'
+    textBtnCadastro: {
+        color: '#968E8E',
+        fontSize: 15,
+        fontWeight: 'normal',
+        paddingHorizontal: 20,
+        paddingVertical: 5,
     }
 });
 

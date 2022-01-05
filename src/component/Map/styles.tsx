@@ -13,7 +13,7 @@ const estilo = StyleSheet.create({
   map: {
     width: Dimensions.get("window").width - 20,
     height: Dimensions.get("window").height - 102,
-    marginTop: 50,
+    marginTop: 20,
     alignSelf: 'center'
   },
   calloutContainer: {
@@ -153,3 +153,8 @@ const estilo = StyleSheet.create({
 });
 
 export default estilo;
+
+
+
+
+

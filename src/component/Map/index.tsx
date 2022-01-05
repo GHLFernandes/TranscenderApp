@@ -6,16 +6,21 @@ import MapView, {
     Region,
     Marker,
     Callout,
-    Circle
+    Circle,
+    AnimatedRegion,
+    Animated,
+    LatLng
 } from "react-native-maps";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Input } from 'react-native-elements';
 import { FontAwesome } from '@expo/vector-icons';
 
-import estilo from './styles';
 import DangerZone from '../../../assets/dangerzone.png';
 import SafeZone from '../../../assets/safezone.png';
-import { ScrollView } from "react-native-gesture-handler";
+import estilo from './styles';
+import { FlatList } from "react-native-gesture-handler";
+import useZonesMap from "../../hooks/useZonesMap";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const GOOGLE_PLACES_API_KEY = 'AIzaSyBxr9fSdqtuSlfaELlQNPWDB8A7AMIJaug';
 
@@ -26,15 +31,9 @@ const initialRegion = {
     longitudeDelta: 0.04
 }
 
-const Map: React.FC = () => {
-    const [pin, setPin] = useState(
-        {
-            latitude: -15.8572577,
-            longitude: -48.0474413
-        }
-    )
-    const [marker, setMarker] = useState([]);
-    const [a, setA] = useState(0);
+const Map: React.FC = (prpos) => {
+    const [zone, setZone] = useState('');
+    const [state, safe, danger] = useZonesMap();
     const [modalVisible, setModalVisible] = useState(false);
     const [region, setRegion] = useState<Region>();
     const [errorMsg, setErrorMsg] = useState(null);
@@ -46,25 +45,6 @@ const Map: React.FC = () => {
     });
     const [local, setLocal] = useState("");
 
-    const handleNewMarker = (estado, coordenada) => {
-        if (estado > 0) {
-            setMarker([...marker, coordenada]);
-        }
-
-        setA(0);
-    };
-
-    const insertSafeZone = () => {
-        setA(1);
-        setModalVisible(!modalVisible);
-    };
-
-    const insertDangerZone = () => {
-        setA(2);
-        setModalVisible(!modalVisible);
-    };
-
-    console.log(marker);
 
     useEffect(() => {
         (async () => {
@@ -94,23 +74,8 @@ const Map: React.FC = () => {
         lon = JSON.stringify(region.longitude);
         console.log(region);
     }
-
-    let image: number | ImageURISource | null | undefined = null;
-    let color: string = '';
-    let border: string = '';
-    
-    if (a == 1) {
-        image = SafeZone;
-        color = "rgba(181, 234, 181, 0.47)";
-        border = 'green';
-    } if (a == 2) {
-        image = DangerZone;
-        color = "rgba(209, 0, 0, 0.27)";
-        border = 'red';
-    }
-
     return (
-        <ScrollView>
+        <SafeAreaView>
             <GooglePlacesAutocomplete
                 placeholder="Pesquisar local"
                 fetchDetails={true}
@@ -122,7 +87,8 @@ const Map: React.FC = () => {
                     // 'details' is provided when fetchDetails = true
                     console.log(data, details);
 
-                    setLocal(data.structured_formatting.main_text)
+                    setLocal(data.structured_formatting.main_text);
+                    console.log(local);
 
                     if (details) {
                         setRegionSearch({
@@ -168,32 +134,39 @@ const Map: React.FC = () => {
                 pitchEnabled={true}
                 toolbarEnabled={true}
                 userLocationUpdateInterval={100}
+                onPress={(e) => {
 
-                onPress={(e) => handleNewMarker(a, e.nativeEvent.coordinate)}
+                    switch (zone) {
+                        case 'SAFE':
+                            safe(e.nativeEvent.coordinate);
+                        break;
+                        case 'DANGER':
+                            danger(e.nativeEvent.coordinate);
+                        break;
+                        default:
+                            setZone('');
+                    }
+
+                    setZone('');
+                    console.log(zone);
+                    console.log(state[state.lenght - 1]);
+
+                }}
             >
-                {marker.length > 0 &&
-                    marker.map((m) => {
-                        return (<Marker coordinate={m}
+                <Marker coordinate={{ latitude: regionSearch.lat, longitude: regionSearch.lng }} />
+                {state.length > 0 &&
+                    state.map((item) => {
+                        return (<Marker coordinate={item.coordenada}
                             draggable={true}
-                            image={image}
-                            key={Math.random().toString()}
-                            onPress={() => setModalVisible(true)}
-                        />
+                            key={item.id}
+                        >
+                            <FontAwesome name={item.nome} size={30} color={item.border} />
+
+
+                        </Marker>
                         )
                     })
                 }
-                {marker.length > 0 &&
-                    marker.map((m) => {
-                        return (
-                            <Circle center={m}
-                                radius={300} fillColor={color} strokeColor={border}
-                            />
-                        )
-                    })
-                }
-
-
-
             </MapView>
             <View style={estilo.btnLinhaMarcador}>
                 <TouchableOpacity style={estilo.btnMarcador}
@@ -208,7 +181,6 @@ const Map: React.FC = () => {
                 transparent={true}
                 visible={modalVisible}
                 onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
                     setModalVisible(!modalVisible);
                 }}
             >
@@ -217,27 +189,38 @@ const Map: React.FC = () => {
                         <Text style={estilo.modalText}>Adicionar Nova Ocorrência</Text>
                         <TouchableOpacity
                             style={[estilo.button, estilo.buttonClose]}
-                            onPress={() => insertSafeZone()}
+                            onPress={() => {
+                                setZone('SAFE');
+                                setModalVisible(!modalVisible);
+                            }
+                            }
                         >
                             <Text style={estilo.textStyle}>Adicionar Zona Segura!</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[estilo.button, estilo.buttonClose]}
-                            onPress={() => insertDangerZone()}
+                            onPress={() => {
+                                setZone('DANGER');
+                                setModalVisible(!modalVisible);
+                            }}
                         >
                             <Text style={estilo.textStyle}>Adicionar Zona de Perigo!</Text>
                             <Text style={estilo.textStyle}>Tome Cuidado!</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[estilo.button, estilo.buttonClose]}
-                            onPress={() => setModalVisible(!modalVisible)}
+                            onPress={() => {
+                                setZone('');
+                                setModalVisible(!modalVisible)
+                            }
+                            }
                         >
                             <Text style={estilo.textStyle}>Hide Modal</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
-        </ScrollView>
+        </SafeAreaView>
 
     )
 }

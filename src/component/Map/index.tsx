@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Linking, Text, View, TouchableOpacity, Modal, ImageURISource } from "react-native";
+import { Text, View, TouchableOpacity, Modal } from "react-native";
 import * as Location from "expo-location";
 import MapView, {
     PROVIDER_GOOGLE,
@@ -14,11 +14,8 @@ import MapView, {
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Input } from 'react-native-elements';
 import { FontAwesome } from '@expo/vector-icons';
-
-import DangerZone from '../../../assets/dangerzone.png';
-import SafeZone from '../../../assets/safezone.png';
+import CryptoES from 'crypto-es';
 import estilo from './styles';
-import { FlatList } from "react-native-gesture-handler";
 import useZonesMap from "../../hooks/useZonesMap";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -27,24 +24,23 @@ const GOOGLE_PLACES_API_KEY = 'AIzaSyBxr9fSdqtuSlfaELlQNPWDB8A7AMIJaug';
 const initialRegion = {
     latitude: -15.8472577,
     longitude: -48.0474413,
-    latitudeDelta: 0.04,
-    longitudeDelta: 0.04
+    latitudeDelta: 0.02,
+    longitudeDelta: 0.02
 }
 
 const Map: React.FC = (prpos) => {
     const [zone, setZone] = useState('');
-    const [state, safe, danger] = useZonesMap();
+    const [state, safe, danger, drag] = useZonesMap();
     const [modalVisible, setModalVisible] = useState(false);
     const [region, setRegion] = useState<Region>();
     const [errorMsg, setErrorMsg] = useState(null);
+    const [local, setLocal] = useState("");
     const [regionSearch, setRegionSearch] = useState({
         lat: -15.8572577,
         lng: -48.0474413,
-        latDelta: 0.07,
-        lngDelta: 0.07
+        latDelta: 0.02,
+        lngDelta: 0.02
     });
-    const [local, setLocal] = useState("");
-
 
     useEffect(() => {
         (async () => {
@@ -58,7 +54,7 @@ const Map: React.FC = (prpos) => {
                 coords: { latitude, longitude },
             } = await Location.getCurrentPositionAsync();
 
-            setRegion({ latitude, longitude, latitudeDelta: 0.04, longitudeDelta: 0.04 });
+            setRegion({ latitude, longitude, latitudeDelta: 0.02, longitudeDelta: 0.02 });
         })();
     }, []);
 
@@ -81,7 +77,7 @@ const Map: React.FC = (prpos) => {
                 fetchDetails={true}
                 GooglePlacesSearchQuery={{
                     rankby: "distance",
-                    radius: 500,
+                    radius: 700,
                 }}
                 onPress={(data, details) => {
                     // 'details' is provided when fetchDetails = true
@@ -94,8 +90,8 @@ const Map: React.FC = (prpos) => {
                         setRegionSearch({
                             lat: details.geometry.location.lat,
                             lng: details.geometry.location.lng,
-                            latDelta: 0.07,
-                            lngDelta: 0.07
+                            latDelta: 0.02,
+                            lngDelta: 0.02
                         })
                     }
                 }}
@@ -121,10 +117,13 @@ const Map: React.FC = (prpos) => {
                 nearbyPlacesAPI='GoogleReverseGeocoding'
             />
 
+
+
             <MapView style={estilo.map}
                 provider={PROVIDER_GOOGLE}
                 initialRegion={initialRegion}
                 region={region}
+                showsCompass={true}
                 showsUserLocation={true}
                 showsMyLocationButton={true}
                 showsPointsOfInterest={true}
@@ -133,37 +132,62 @@ const Map: React.FC = (prpos) => {
                 loadingEnabled={true}
                 pitchEnabled={true}
                 toolbarEnabled={true}
+                showsBuildings={true}
+                userLocationAnnotationTitle={'Estou aqui'}
                 userLocationUpdateInterval={100}
                 onPress={(e) => {
 
                     switch (zone) {
                         case 'SAFE':
                             safe(e.nativeEvent.coordinate);
-                        break;
+                            break;
                         case 'DANGER':
                             danger(e.nativeEvent.coordinate);
-                        break;
+                            break;
                         default:
                             setZone('');
                     }
 
                     setZone('');
-                    console.log(zone);
-                    console.log(state[state.lenght - 1]);
+                    // console.log(zone);
+                    // console.log(state[state.lenght - 1]);
 
                 }}
             >
                 <Marker coordinate={{ latitude: regionSearch.lat, longitude: regionSearch.lng }} />
                 {state.length > 0 &&
                     state.map((item) => {
-                        return (<Marker coordinate={item.coordenada}
-                            draggable={true}
-                            key={item.id}
-                        >
-                            <FontAwesome name={item.nome} size={30} color={item.border} />
+                        return (
+                            <View>                              
+                                <Marker coordinate={item.coordenada}
+                                    draggable={true}
+
+                                    key={item.id}
+                                    identifier={item.id}
+                                    onDragStart={(e) => {
+                                        console.log(e.nativeEvent)
+                                    }}
+                                    onDragEnd={(e) => {
+                                        drag(item.id, e.nativeEvent.coordinate)
+                                    }}
+                                    title={item.zone + 'Zone'}
+                                >
+                                    <FontAwesome name={item.icon} size={30} color={item.border} />
+                                    <Callout style={estilo.calloutContainer}>
+                                        <Text style={estilo.calloutText}>{item.zone + 'ZONE'}</Text>
+                                        <Text style={estilo.calloutText}>{item.info.desc}</Text>
+                                    </Callout>
+
+                                </Marker>
+                                <Circle center={item.coordenada}
+                                    key={CryptoES.SHA256(Math.random().toFixed(3).toString()).toString()}
+                                    radius={item.radius}
+                                    fillColor={item.color}
+                                    strokeColor={item.border}
+                                />
+                            </View>
 
 
-                        </Marker>
                         )
                     })
                 }

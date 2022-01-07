@@ -17,18 +17,14 @@ const estilo = StyleSheet.create({
     alignSelf: 'center'
   },
   calloutContainer: {
-    width: 160,
-    height: "100%",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+   width: 160,
+    height:'auto',
     backgroundColor: "rgba(255, 255, 255, 0.8)",
     borderRadius: 16,
-    justifyContent: "center",
   },
 
   calloutText: {
-    color: "#0089a5",
-    textDecorationLine: "underline",
+    color: "black",
     fontSize: 14,
   },
 

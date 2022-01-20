@@ -6,13 +6,13 @@ import "firebase/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyCopC3oyeMgfZlLqiFjWBd3GvCj-rDFce0",
-    authDomain: "formal-triode-336015.firebaseapp.com",
-    projectId: "formal-triode-336015",
-    storageBucket: "formal-triode-336015.appspot.com",
-    messagingSenderId: "839353697748",
-    appId: "1:839353697748:web:63011be5c6672e04dc4241",
-    measurementId: "G-B97WD5CC73"
+    apiKey: "apiKey",
+    authDomain: "authDomain",
+    projectId: "projectId",
+    storageBucket: "storageBucket",
+    messagingSenderId: "messagingSenderId",
+    appId: "appId",
+    measurementId: "measurementId"
 };
 
 // Initialize Firebase

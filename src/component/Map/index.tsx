@@ -19,7 +19,7 @@ import estilo from './styles';
 import useZonesMap from "../../hooks/useZonesMap";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const GOOGLE_PLACES_API_KEY = 'AIzaSyBxr9fSdqtuSlfaELlQNPWDB8A7AMIJaug';
+const GOOGLE_PLACES_API_KEY = 'GOOGLE_PLACES_API_KEY';
 
 const initialRegion = {
     latitude: -15.8472577,
